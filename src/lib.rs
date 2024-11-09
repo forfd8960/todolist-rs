@@ -1,5 +1,10 @@
-use std::sync::Arc;
+use auth::Authorization;
+use sqlx::PgPool;
+use std::{ops::Deref, sync::Arc};
 
+pub mod auth;
+pub mod config;
+pub mod errors;
 pub mod handlers;
 pub mod models;
 pub mod route;
@@ -23,4 +28,14 @@ pub struct AppState {
 }
 
 #[derive(Debug)]
-pub struct InnerAppState {}
+pub struct InnerAppState {
+    pub(crate) pool: PgPool,
+    pub(crate) auth: Authorization,
+}
+
+impl Deref for AppState {
+    type Target = InnerAppState;
+    fn deref(&self) -> &Self::Target {
+        &self.state
+    }
+}

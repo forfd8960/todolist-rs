@@ -20,6 +20,9 @@ pub enum AppError {
 
     #[error("todo not exists: {0}")]
     TodoNotExists(String),
+
+    #[error("anyhow error: {0}")]
+    AnyhowError(#[from] anyhow::Error),
 }
 
 impl IntoResponse for AppError {
@@ -31,6 +34,7 @@ impl IntoResponse for AppError {
             Self::DBError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             Self::IOError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             Self::TodoNotExists(_) => StatusCode::NOT_FOUND,
+            Self::AnyhowError(_) => StatusCode::INTERNAL_SERVER_ERROR,
         };
 
         (status_code, format!("{}", self)).into_response()

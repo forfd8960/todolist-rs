@@ -26,7 +26,7 @@ pub async fn run(state: AppState, conf: &AppConfig) -> anyhow::Result<()> {
     Ok(())
 }
 
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 pub struct AppState {
     state: Arc<InnerAppState>,
 }
@@ -34,16 +34,14 @@ pub struct AppState {
 impl AppState {
     pub async fn new(conf: &AppConfig) -> Result<Self, AppError> {
         let pool = PgPool::connect(&conf.server.db_url).await?;
+        let auth = Authorization::new(&conf.auth.private_key, &conf.auth.public_key)?;
+
         Ok(Self {
-            state: Arc::new(InnerAppState {
-                pool: pool,
-                auth: Authorization {},
-            }),
+            state: Arc::new(InnerAppState { pool, auth }),
         })
     }
 }
 
-#[derive(Debug)]
 pub struct InnerAppState {
     pub(crate) pool: PgPool,
     pub(crate) auth: Authorization,

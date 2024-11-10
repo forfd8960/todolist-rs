@@ -23,6 +23,9 @@ pub enum AppError {
 
     #[error("anyhow error: {0}")]
     AnyhowError(#[from] anyhow::Error),
+
+    #[error("pwd hash error: {0}")]
+    PasswordHashError(String),
 }
 
 impl IntoResponse for AppError {
@@ -35,6 +38,7 @@ impl IntoResponse for AppError {
             Self::IOError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             Self::TodoNotExists(_) => StatusCode::NOT_FOUND,
             Self::AnyhowError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            Self::PasswordHashError(_) => StatusCode::INTERNAL_SERVER_ERROR,
         };
 
         (status_code, format!("{}", self)).into_response()

@@ -1,3 +1,4 @@
+use axum::{http::StatusCode, response::IntoResponse};
 use thiserror::Error;
 
 #[derive(Debug, Error)]
@@ -19,4 +20,19 @@ pub enum AppError {
 
     #[error("todo not exists: {0}")]
     TodoNotExists(String),
+}
+
+impl IntoResponse for AppError {
+    fn into_response(self) -> axum::response::Response {
+        let status_code = match self {
+            Self::EmailAlreadyExists(_) => StatusCode::BAD_REQUEST,
+            Self::AuthFailed(_) => StatusCode::UNAUTHORIZED,
+            Self::TomlError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            Self::DBError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            Self::IOError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            Self::TodoNotExists(_) => StatusCode::NOT_FOUND,
+        };
+
+        (status_code, format!("{}", self)).into_response()
+    }
 }

@@ -11,6 +11,7 @@ axum = { version = "0.7.7", features = [
   "query",
   "tracing",
   "multipart",
+  "macros"
 ] }
 serde = { version = "1.0.214", features = ["derive"] }
 jwt-simple = "0.12.10"

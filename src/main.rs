@@ -1,8 +1,10 @@
-use todolist::App;
+use todolist::{config::AppConfig, run, AppState};
 
-fn main() {
+#[tokio::main]
+async fn main() -> anyhow::Result<()> {
     println!("Hello, world!");
 
-    let app = App::new();
-    app.run();
+    let conf = AppConfig::load("config.toml".to_string())?;
+    let state = AppState::new(&conf).await?;
+    run(state, &conf).await
 }

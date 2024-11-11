@@ -26,6 +26,9 @@ pub enum AppError {
 
     #[error("pwd hash error: {0}")]
     PasswordHashError(String),
+
+    #[error("user not exists: {0}")]
+    UserNotFound(String),
 }
 
 impl IntoResponse for AppError {
@@ -39,6 +42,7 @@ impl IntoResponse for AppError {
             Self::TodoNotExists(_) => StatusCode::NOT_FOUND,
             Self::AnyhowError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             Self::PasswordHashError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            Self::UserNotFound(_) => StatusCode::NOT_FOUND,
         };
 
         (status_code, format!("{}", self)).into_response()

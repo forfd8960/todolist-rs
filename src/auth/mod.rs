@@ -24,7 +24,7 @@ impl Authorization {
         })
     }
 
-    pub fn sign(&self, user: impl Into<User>) -> Result<String, AppError> {
+    pub fn sign(&self, user: User) -> Result<String, AppError> {
         self.encode_key.sign(user)
     }
 
@@ -41,9 +41,8 @@ impl EncodingKey {
         Ok(Self(Ed25519KeyPair::from_pem(pem)?))
     }
 
-    pub fn sign(&self, user: impl Into<User>) -> Result<String, AppError> {
-        let u: User = user.into();
-        let claims = Claims::with_custom_claims(u, Duration::from_secs(JWT_DURATION));
+    pub fn sign(&self, user: User) -> Result<String, AppError> {
+        let claims = Claims::with_custom_claims(user, Duration::from_secs(JWT_DURATION));
         let claims = claims.with_issuer(JWT_ISS).with_audience(JWT_AUD);
 
         Ok(self.0.sign(claims)?)

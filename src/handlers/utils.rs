@@ -29,3 +29,29 @@ pub fn verify_password(password: &str, hash_value: &str) -> Result<bool, AppErro
         Err(e) => Err(AppError::PasswordHashError(format!("{}", e))),
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use anyhow::Result;
+
+    use super::{gen_password_hash, verify_password};
+
+    #[test]
+    fn test_hash_verify_password() -> Result<()> {
+        let pwd_hash = gen_password_hash("abc132569")?;
+        let result = verify_password("abc132569", &pwd_hash)?;
+        assert!(result);
+        Ok(())
+    }
+
+    #[test]
+    fn test_bad_hash() -> Result<()> {
+        let pwd_hash1 = gen_password_hash("def132569")?;
+        let verify_res = verify_password("abc132569", &pwd_hash1)?;
+        assert!(!verify_res);
+
+        let verify_res = verify_password("def132569", "test-hash");
+        assert!(verify_res.is_err());
+        Ok(())
+    }
+}

@@ -43,11 +43,12 @@ pub async fn create_user(input: &CreateUser, pool: &PgPool) -> Result<User, AppE
 }
 
 pub async fn get_user_by_email(email: &str, pool: &PgPool) -> Result<Option<User>, AppError> {
-    let user =
-        sqlx::query_as("SELECT id,username,email,created_at,updated_at FROM users WHERE email=$1")
-            .bind(email)
-            .fetch_optional(pool)
-            .await?;
+    let user = sqlx::query_as(
+        "SELECT id,username,email,password_hash,created_at,updated_at FROM users WHERE email=$1",
+    )
+    .bind(email)
+    .fetch_optional(pool)
+    .await?;
     Ok(user)
 }
 

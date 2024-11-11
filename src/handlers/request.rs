@@ -1,5 +1,7 @@
 use serde::{Deserialize, Serialize};
 
+use crate::models::user::User;
+
 #[derive(Debug, Deserialize)]
 pub struct SignupReq {
     pub username: String,
@@ -9,6 +11,7 @@ pub struct SignupReq {
 
 #[derive(Debug, Serialize)]
 pub struct SignupResp {
+    pub user: User,
     pub token: String,
 }
 

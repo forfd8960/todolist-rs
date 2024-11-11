@@ -15,7 +15,7 @@ pub struct Todo {
     pub updated_at: DateTime<Utc>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Deserialize)]
 pub enum TodoStatus {
     Pending,
     Ready,
@@ -28,7 +28,7 @@ impl TodoStatus {
         match self {
             TodoStatus::Pending => 0,
             TodoStatus::Ready => 1,
-            TodoStatus::InProgress => 3,
+            TodoStatus::InProgress => 2,
             TodoStatus::Done => 3,
         }
     }

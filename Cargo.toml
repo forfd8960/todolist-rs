@@ -13,6 +13,7 @@ axum = { version = "0.7.7", features = [
   "multipart",
   "macros"
 ] }
+axum-extra = { version = "0.9.3", features = ["typed-header"] }
 serde = { version = "1.0.214", features = ["derive"] }
 jwt-simple = "0.12.10"
 chrono = { version = "0.4.38", features = ["serde"] }

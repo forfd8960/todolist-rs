@@ -1,12 +1,20 @@
-use axum::{routing::post, Router};
+use axum::{
+    routing::{get, post},
+    Router,
+};
 
 use crate::{
-    handlers::user::{signin_handler, signup_handler},
+    handlers::{
+        todolist::{create_todo_handler, get_todo_handler},
+        user::{signin_handler, signup_handler},
+    },
     AppState,
 };
 
 pub fn get_route(state: AppState) -> Router {
     let route = Router::new()
+        .route("todos", post(create_todo_handler))
+        .route("todos/:id", get(get_todo_handler))
         .route("/signup", post(signup_handler))
         .route("/signin", post(signin_handler))
         .with_state(state);

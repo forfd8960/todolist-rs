@@ -42,6 +42,14 @@ pub struct CreateTodo {
     pub status: i16,
 }
 
+#[derive(Debug)]
+pub struct GetTodosArgs {
+    pub user_id: i64,
+    pub offset: i64,
+    pub limit: i64,
+    pub status: Option<i16>,
+}
+
 pub async fn create_todo(input: &CreateTodo, pool: &PgPool) -> Result<Todo, AppError> {
     let todo = sqlx::query_as(
         r#"INSERT INTO todos (user_id,title,description,status)
@@ -74,33 +82,52 @@ pub async fn get_todo_by_id(id: i64, pool: &PgPool) -> Result<Option<Todo>, AppE
     Ok(todo)
 }
 
-pub async fn get_todos_by_user_id(user_id: i64, pool: &PgPool) -> Result<Vec<Todo>, AppError> {
+pub async fn get_todos_by_user_id(
+    args: GetTodosArgs,
+    pool: &PgPool,
+) -> Result<Vec<Todo>, AppError> {
+    let mut offset = args.offset;
+    if args.offset < 0 {
+        offset = 0;
+    }
+
+    let mut limit = args.limit;
+    if args.limit <= 0 || args.limit > 100 {
+        limit = 100
+    }
+
+    let mut status = TodoStatus::Pending.get_status_id();
+    if args.status.is_some() {
+        status = args.status.unwrap();
+    }
+
     let todos = sqlx::query_as(
         r#"
         SELECT id,user_id,title,description,status,created_at,updated_at
         FROM todos
-        WHERE user_id=$1
-        ORDER BY created_at DESC;
+        WHERE user_id=$1 AND status=$2
+        ORDER BY id DESC
+        LIMIT $3
+        OFFSET $4;
     "#,
     )
-    .bind(user_id)
+    .bind(args.user_id)
+    .bind(status)
+    .bind(limit)
+    .bind(offset)
     .fetch_all(pool)
     .await?;
 
     Ok(todos)
 }
 
-pub async fn update_todo_status(
-    id: i64,
-    status: i16,
-    pool: &PgPool,
-) -> Result<Option<Todo>, AppError> {
+pub async fn update_todo_status(id: i64, status: i16, pool: &PgPool) -> Result<Todo, AppError> {
     let todo = get_todo_by_id(id, pool).await?;
     if todo.is_none() {
         return Err(AppError::TodoNotExists(format!("{} is not exists", id)));
     }
 
-    let todo: Todo = sqlx::query_as(
+    let todo = sqlx::query_as(
         r#"
         UPDATE todos SET status=$1 WHERE id=$2
         RETURNING id,user_id,title,description,status,created_at,updated_at;
@@ -111,7 +138,7 @@ pub async fn update_todo_status(
     .fetch_one(pool)
     .await?;
 
-    Ok(Some(todo))
+    Ok(todo)
 }
 
 #[cfg(test)]
@@ -238,10 +265,8 @@ mod tests {
 
         let new_status = TodoStatus::Ready.get_status_id();
 
-        let todo_res = update_todo_status(todo.id, new_status, &pool).await?;
-        assert!(todo_res.is_some());
+        let todo = update_todo_status(todo.id, new_status, &pool).await?;
 
-        let todo = todo_res.unwrap();
         assert_eq!(todo.title, "axum-tutorial".to_string());
         assert_eq!(todo.description, "1: write doc, 2: make video".to_string());
         assert_eq!(todo.status, new_status);

@@ -45,10 +45,16 @@ pub struct CreateTodoResp {
 pub struct ListTodosReq {
     pub offset: i64,
     pub limit: i64,
+    pub status: TodoStatus,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct UpdateTodosReq {
+    pub status: TodoStatus,
 }
 
 #[derive(Debug, Serialize)]
 pub struct ListTodosResp {
-    pub todos: Todo,
+    pub todos: Vec<Todo>,
     pub has_more: bool,
 }

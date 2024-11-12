@@ -2,9 +2,5 @@
 port=8686
 db_url="postgres://db_manager:super_admin8801@localhost:5432/todolist"
 [auth]
-private_key="""-----BEGIN PRIVATE KEY-----
-MC4CAQAwBQYDK2VwBCIEIL5wc3j8tMPCQRaqjOjpN3DzrbVuPYOEn7RAQUbvxD+M
------END PRIVATE KEY-----"""
-public_key="""-----BEGIN PUBLIC KEY-----
-MCowBQYDK2VwAyEA8NoOTiedNOCrh7bMNh2FpYxkotn1Xsyu0OQs4O5AuDY=
------END PUBLIC KEY-----"""
+private_key="""xxx"""
+public_key="""xxx"""

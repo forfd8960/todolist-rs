@@ -13,8 +13,8 @@ use crate::{
 
 pub fn get_route(state: AppState) -> Router {
     let route = Router::new()
-        .route("todos", post(create_todo_handler))
-        .route("todos/:id", get(get_todo_handler))
+        .route("/todos", post(create_todo_handler))
+        .route("/todos/:id", get(get_todo_handler))
         .route("/signup", post(signup_handler))
         .route("/signin", post(signin_handler))
         .with_state(state);

@@ -1,6 +1,7 @@
 use std::fs;
 
 use serde::Deserialize;
+use tracing::info;
 
 use crate::errors::AppError;
 
@@ -25,7 +26,10 @@ pub struct AuthConfig {
 impl AppConfig {
     pub fn load(path: String) -> Result<Self, AppError> {
         let config_content = fs::read_to_string(path)?;
+        info!("{}", config_content);
+
         let config: AppConfig = toml::from_str(&config_content)?;
+        info!("config: {:?}", config);
         Ok(config)
     }
 }
